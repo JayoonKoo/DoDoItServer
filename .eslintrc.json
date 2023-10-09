@@ -1,0 +1,17 @@
+{
+  "env": {
+      "node": true,
+      "commonjs": true,
+      "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
+  "plugins": ["@typescript-eslint","prettier"],
+  "parserOptions": {
+      "ecmaVersion": 8
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "@typescript-eslint/no-var-requires": "off"     
+  }
+}
