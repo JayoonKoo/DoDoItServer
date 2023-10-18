@@ -3,9 +3,9 @@ import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-import 'reflect-metadata';
 
 import env from './config/env';
+import { AppDataSource } from './data-source';
 
 const app = express();
 
@@ -19,4 +19,7 @@ app.use(cookieParser(env.host.cookieSecret));
 
 app.listen(env.host.port, () => {
   console.log(`${env.host.port} 포트에서 서버 실행중`);
+  AppDataSource.initialize()
+    .then(() => console.log('DB initialize'))
+    .catch(console.error);
 });

@@ -15,6 +15,7 @@ const env = {
     password: required('DB_PASSWORD', 'dbpassword'),
     database: required('DB_DATABASE', 'dbdatabase'),
     host: required('DB_HOST', 'dbhost'),
+    port: parseInt(required('DB_PORT', '3306')),
   },
   host: {
     port: parseInt(required('HOST_PORT', '8080')),
