@@ -14,8 +14,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 app.use(cors());
 app.use(morgan('tiny'));
-app.use(cookieParser(env.cookieSecret));
+app.use(cookieParser(env.host.cookieSecret));
 
-app.listen(env.port, () => {
-  console.log(`${env.port} 포트에서 서버 실행중`);
+app.listen(env.host.port, () => {
+  console.log(`${env.host.port} 포트에서 서버 실행중`);
 });
