@@ -22,7 +22,7 @@ const env = {
     cookieSecret: required('COOKIE_SECRET', 'cookie_secret'),
   },
   bcrypt: {
-    saltRounds: required('SALT_ROUNDS', 0),
+    saltRounds: parseInt(required('SALT_ROUNDS', '0')),
   },
   jwt: {
     scretKey: required('JWT_SECRET', 'jwt_scret'),
