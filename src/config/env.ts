@@ -21,6 +21,13 @@ const env = {
     port: parseInt(required('HOST_PORT', '8080')),
     cookieSecret: required('COOKIE_SECRET', 'cookie_secret'),
   },
+  bcrypt: {
+    saltRounds: required('SALT_ROUNDS', 0),
+  },
+  jwt: {
+    scretKey: required('JWT_SECRET', 'jwt_scret'),
+    expiresIn: required('JWT_EXPIRES_IN', 'expiresIn'),
+  },
 };
 
 export default env;
