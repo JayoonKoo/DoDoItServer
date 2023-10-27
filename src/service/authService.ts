@@ -4,6 +4,7 @@ import env from '../config/env';
 import userRepository from '../repository/UserRepository';
 import AuthException, { AuthExceptionType } from './exception/AuthException';
 import User from '../model/user';
+import { Login } from './type/authServiceType';
 
 const authService = {
   signUp: async (user: User) => {
@@ -24,6 +25,20 @@ const authService = {
     const token = authService._createJwtToken(createUser.id);
 
     return { token, nickname };
+  },
+
+  login: async ({ email, password }: Login) => {
+    const user = await userRepository.findOneBy({ email });
+    if (!user) {
+      throw new AuthException({ message: '가입한 회원이 없습니다.', type: AuthExceptionType.NoUser });
+    }
+
+    const isValid = await bcrypt.compare(password, password);
+    if (!isValid) {
+      throw new AuthException({ message: '패스워드가 틀렸습니다.', type: AuthExceptionType.PasswordNotMatch });
+    }
+    const token = authService._createJwtToken(user.id);
+    return { token, nickname: user.nickname };
   },
 
   _createJwtToken: (id: number) => {

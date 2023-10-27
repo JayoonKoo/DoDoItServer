@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import env from './config/env';
 import { AppDataSource } from './data-source';
 import authRouter from './router/authRouter';
+import Res from './lib/Res';
 
 const app = express();
 
@@ -28,7 +29,8 @@ app.use((req, res) => {
 // server Error Router
 const errRouter: ErrorRequestHandler = (err, req, res) => {
   console.error(err);
-  return res.sendStatus(500);
+  const body = process.env.NODE_ENV == 'production' ? {} : err;
+  return res.status(500).send(new Res({ body }));
 };
 app.use(errRouter);
 
