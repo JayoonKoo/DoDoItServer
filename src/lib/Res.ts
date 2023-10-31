@@ -4,7 +4,7 @@ type ResConstructor<T> = {
 };
 class Res<T> {
   message?: string;
-  body?: T | null;
+  body: T | null;
 
   constructor({ message = 'Server Error', body = null }: ResConstructor<T>) {
     this.message = message;

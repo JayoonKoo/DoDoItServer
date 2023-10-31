@@ -4,11 +4,10 @@ import env from '../config/env';
 import userRepository from '../repository/UserRepository';
 import AuthException, { AuthExceptionType } from './exception/AuthException';
 import User from '../model/user';
-import { Login } from './type/authServiceType';
+import { Login, Me } from './type/authServiceType';
 
 const authService = {
-  signUp: async (user: User) => {
-    const { email, password, nickname } = user;
+  signUp: async ({ email, password, nickname }: User) => {
     const exUser = await userRepository.findOneBy({ email });
     if (exUser) {
       throw new AuthException({ message: '이미 가입한 사용자 입니다.', type: AuthExceptionType.Duplication });
@@ -33,12 +32,20 @@ const authService = {
       throw new AuthException({ message: '가입한 회원이 없습니다.', type: AuthExceptionType.NoUser });
     }
 
-    const isValid = await bcrypt.compare(password, password);
+    const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       throw new AuthException({ message: '패스워드가 틀렸습니다.', type: AuthExceptionType.PasswordNotMatch });
     }
     const token = authService._createJwtToken(user.id);
     return { token, nickname: user.nickname };
+  },
+
+  me: async ({ userId }: Me) => {
+    const user = await userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new AuthException({ message: '사용자 정보를 찾지 못했습니다.', type: AuthExceptionType.NoUser });
+    }
+    return user;
   },
 
   _createJwtToken: (id: number) => {
