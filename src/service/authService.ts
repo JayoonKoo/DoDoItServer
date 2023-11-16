@@ -48,6 +48,18 @@ const authService = {
     return user;
   },
 
+  verifyToken: async (token: string) => {
+    return new Promise<number>((resolve) => {
+      jwt.verify(token, env.jwt.scretKey, async (error, decoded) => {
+        if (error || !decoded) {
+          throw new AuthException({ type: AuthExceptionType.InvalidToken });
+        }
+
+        return resolve(decoded.id);
+      });
+    });
+  },
+
   _createJwtToken: (id: number) => {
     return jwt.sign({ id }, env.jwt.scretKey, { expiresIn: env.jwt.expiresIn });
   },

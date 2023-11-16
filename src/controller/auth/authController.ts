@@ -4,6 +4,8 @@ import authService from '../../service/authService';
 import AuthException, { AuthExceptionType } from '../../service/exception/AuthException';
 import Res from '../../lib/Res';
 import { ControllerType } from '../type';
+import env from '../../config/env';
+import { CookieOptions } from 'express';
 
 const authController: ControllerType = {
   signUp: async (req, res, next) => {
@@ -39,6 +41,13 @@ const authController: ControllerType = {
 
     try {
       const { nickname, token } = await authService.login({ email, password });
+      const options: CookieOptions = {
+        maxAge: env.jwt.expiresIn * 1000,
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      };
+      res.cookie('token', token, options); // HTTP-ONLY 🍪
       return res.status(200).send(new Res({ message: '로그인 성공', body: { nickname, token } }));
     } catch (e) {
       if (e instanceof AuthException) {

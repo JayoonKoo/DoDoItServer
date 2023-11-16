@@ -2,6 +2,7 @@ export enum AuthExceptionType {
   Duplication = 'duplication user',
   NoUser = 'no user',
   PasswordNotMatch = 'password not match',
+  InvalidToken = 'invalid token',
 }
 
 type AuthExceptionConstructor = {
