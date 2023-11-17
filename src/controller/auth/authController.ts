@@ -44,8 +44,9 @@ const authController: ControllerType = {
       const options: CookieOptions = {
         maxAge: env.jwt.expiresIn * 1000,
         httpOnly: true,
-        sameSite: 'none',
-        secure: true,
+        // sameSite: 'none',
+        // secure: true,
+        signed: true,
       };
       res.cookie('token', token, options); // HTTP-ONLY 🍪
       return res.status(200).send(new Res({ message: '로그인 성공', body: { nickname, token } }));

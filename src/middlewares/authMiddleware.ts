@@ -13,7 +13,7 @@ export const isAuth: RequestHandler = async (req, res, next) => {
   }
 
   if (!token) {
-    token = req.cookies.token;
+    token = req.signedCookies.token;
   }
 
   if (!token) {

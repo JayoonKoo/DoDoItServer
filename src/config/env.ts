@@ -20,6 +20,7 @@ const env = {
   host: {
     port: parseInt(required('HOST_PORT', '8080')),
     cookieSecret: required('COOKIE_SECRET', 'cookie_secret'),
+    origin: required('ORIGIN', 'origin'),
   },
   bcrypt: {
     saltRounds: parseInt(required('SALT_ROUNDS', '0')),
