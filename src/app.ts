@@ -7,19 +7,21 @@ import cookieParser from 'cookie-parser';
 import env from './config/env';
 import { AppDataSource } from './data-source';
 import authRouter from './router/authRouter';
+import todoRouter from './router/todoRouter';
 import Res from './lib/Res';
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser(env.host.cookieSecret));
 app.use(helmet());
+app.use(cors({ credentials: true, origin: env.host.origin, optionsSuccessStatus: 200 }));
 // app.use(express.urlencoded({ extended: false }));
-app.use(cors({ optionsSuccessStatus: 200, credentials: true, origin: env.host.origin }));
 
 app.use(morgan('tiny'));
-app.use(cookieParser(env.host.cookieSecret));
 // router
 app.use('/auth', authRouter);
+app.use('/todo', todoRouter);
 
 // not found
 app.use((req, res) => {
