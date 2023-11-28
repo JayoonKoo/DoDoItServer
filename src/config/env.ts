@@ -29,7 +29,7 @@ const env = {
     scretKey: required('JWT_SECRET', 'jwt_scret'),
     refreshKey: required('JWT_REFRESH', 'jwt_refresh'),
     expiresIn: parseInt(required('JWT_EXPIRES_IN', '0')),
-    expiresRefresh: parseInt(required('JWT_EXPIRES_REFRESH', 'jwt_expires_refresh')),
+    expiresRefresh: parseInt(required('JWT_EXPIRES_REFRESH', '0')),
   },
 };
 

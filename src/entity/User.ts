@@ -13,4 +13,7 @@ export class User {
 
   @Column({ length: 100 })
   password: string;
+
+  @Column({ length: 200 })
+  refreshToken: string;
 }

@@ -6,3 +6,9 @@ export type Login = {
 export type Me = {
   userId: number;
 };
+
+export type RefreshReturn = {
+  accessToken: string;
+  refreshToken: string;
+  nickname: string;
+};

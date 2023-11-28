@@ -4,7 +4,7 @@ import env from '../config/env';
 import userRepository from '../repository/UserRepository';
 import AuthException, { AuthExceptionType } from './exception/AuthException';
 import User from '../model/user';
-import { Login, Me } from './type/authServiceType';
+import { Login, Me, RefreshReturn } from './type/authServiceType';
 
 const authService = {
   signUp: async ({ email, password, nickname }: User) => {
@@ -36,8 +36,12 @@ const authService = {
     if (!isValid) {
       throw new AuthException({ message: '패스워드가 틀렸습니다.', type: AuthExceptionType.PasswordNotMatch });
     }
-    const token = authService._createJwtToken(user.id);
-    return { token, nickname: user.nickname };
+    const accessToken = authService._createJwtToken(user.id);
+    const refreshToken = authService._createRefreshToken(user.id);
+
+    await userRepository.update({ email }, { refreshToken });
+
+    return { token: accessToken, refreshToken, nickname: user.nickname };
   },
 
   me: async ({ userId }: Me) => {
@@ -60,8 +64,33 @@ const authService = {
     });
   },
 
+  verifyRefreshToken: async (refreshToken: string) => {
+    return new Promise<RefreshReturn>((resolve, reject) => {
+      jwt.verify(refreshToken, env.jwt.refreshKey, async (error, decoded) => {
+        if (error || !decoded) {
+          return reject(new AuthException({ type: AuthExceptionType.InvalidToken }));
+        }
+
+        const user = await userRepository.findOneBy({ id: decoded.id, refreshToken: refreshToken });
+        if (!user) {
+          return reject(new AuthException({ type: AuthExceptionType.NoUser }));
+        }
+
+        return resolve({
+          accessToken: authService._createJwtToken(decoded.id),
+          refreshToken: authService._createRefreshToken(decoded.id),
+          nickname: user.nickname,
+        });
+      });
+    });
+  },
+
   _createJwtToken: (id: number) => {
     return jwt.sign({ id }, env.jwt.scretKey, { expiresIn: env.jwt.expiresIn });
+  },
+
+  _createRefreshToken: (id: number) => {
+    return jwt.sign({ id }, env.jwt.refreshKey, { expiresIn: env.jwt.expiresRefresh });
   },
 };
 

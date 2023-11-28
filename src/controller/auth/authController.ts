@@ -3,9 +3,9 @@ import User from '../../model/user';
 import authService from '../../service/authService';
 import AuthException, { AuthExceptionType } from '../../service/exception/AuthException';
 import Res from '../../lib/Res';
-import { ControllerType } from '../type';
 import env from '../../config/env';
-import { CookieOptions } from 'express';
+import { CookieOptions, Response } from 'express';
+import { ControllerType } from '../type';
 
 const authController: ControllerType = {
   signUp: async (req, res, next) => {
@@ -40,16 +40,9 @@ const authController: ControllerType = {
     console.log(req.body);
 
     try {
-      const { nickname, token } = await authService.login({ email, password });
-      const options: CookieOptions = {
-        maxAge: env.jwt.expiresIn * 1000,
-        httpOnly: true,
-        // sameSite: 'none',
-        // secure: true,
-        signed: true,
-      };
-      res.cookie('token', token, options); // HTTP-ONLY 🍪
-      return res.status(200).send(new Res({ message: '로그인 성공', body: { nickname, token } }));
+      const { nickname, token, refreshToken } = await authService.login({ email, password });
+      setCookie(token, refreshToken, res);
+      return res.status(200).send(new Res({ message: '로그인 성공', body: { nickname, token, refreshToken } }));
     } catch (e) {
       if (e instanceof AuthException) {
         console.error(e);
@@ -79,6 +72,46 @@ const authController: ControllerType = {
       next(e);
     }
   },
+
+  refresh: async (req, res, next) => {
+    try {
+      const { accessToken, refreshToken, nickname } = await authService.verifyRefreshToken(req.refreshToken);
+      setCookie(accessToken, refreshToken, res);
+      return res
+        .status(200)
+        .send(new Res({ message: '로그인 성공', body: { nickname, token: accessToken, refreshToken } }));
+    } catch (e) {
+      console.error(e);
+      if (e instanceof AuthException) {
+        switch (e.type) {
+          case AuthExceptionType.InvalidToken:
+            return res.status(401).send(new Res({ message: e.message }));
+          case AuthExceptionType.NoUser:
+            return res.status(404).send(new Res({ message: e.message }));
+        }
+      }
+
+      next(e);
+    }
+  },
 };
+
+function setCookie(token: string, refreshToken: string, res: Response) {
+  const options: CookieOptions = {
+    maxAge: env.jwt.expiresIn * 1000,
+    httpOnly: true,
+    // sameSite: 'none',
+    // secure: true,
+    signed: true,
+  };
+
+  const refrehOptions: CookieOptions = {
+    maxAge: env.jwt.expiresRefresh * 1000,
+    httpOnly: true,
+    signed: true,
+  };
+  res.cookie('token', token, options); // HTTP-ONLY 🍪
+  res.cookie('refreshToken', refreshToken, refrehOptions);
+}
 
 export default authController;

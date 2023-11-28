@@ -30,3 +30,24 @@ export const isAuth: RequestHandler = async (req, res, next) => {
   req.token = token;
   next();
 };
+
+export const isHasRefresh: RequestHandler = async (req, res, next) => {
+  let refreshToken: string | undefined;
+  refreshToken = req.get('refreshToken');
+
+  // 웹 클라이언트를 위한 셋팅
+  if (!refreshToken) {
+    refreshToken = req.signedCookies.refreshToken;
+  }
+
+  if (!refreshToken) {
+    return res.status(401).send(
+      new Res({
+        message: 'invalid token',
+      })
+    );
+  }
+
+  req.refreshToken = refreshToken;
+  next();
+};
