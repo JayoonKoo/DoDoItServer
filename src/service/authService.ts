@@ -49,10 +49,10 @@ const authService = {
   },
 
   verifyToken: async (token: string) => {
-    return new Promise<number>((resolve) => {
+    return new Promise<number>((resolve, reject) => {
       jwt.verify(token, env.jwt.scretKey, async (error, decoded) => {
         if (error || !decoded) {
-          throw new AuthException({ type: AuthExceptionType.InvalidToken });
+          return reject(new AuthException({ type: AuthExceptionType.InvalidToken }));
         }
 
         return resolve(decoded.id);
